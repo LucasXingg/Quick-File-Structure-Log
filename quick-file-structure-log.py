@@ -1,30 +1,28 @@
 import os
 
 def scan_directory(path, prefix=''):
-    """
-    Scan the directory at 'path' and return its contents in a Markdown-formatted list.
-    'prefix' is used internally to handle indentation for subdirectories.
-    """
-    # Initialize an empty list to hold the directory contents in Markdown format
     markdown_list = []
+    dir_list = []
+    file_dict = []
 
-    # Get all items in the current directory sorted alphabetically
+    # Scan the current directory
     items = sorted(os.listdir(path))
-    
-    # Loop through each item in the current directory
     for item in items:
-        # Construct the full path to the item
         full_path = os.path.join(path, item)
-        
-        # Check if the item is a directory
         if os.path.isdir(full_path):
-            # Add the directory name to the list, formatted as a Markdown list item
-            markdown_list.append(f"{prefix}- {item}/")
-            # Recursively scan the subdirectory, increasing the indentation
-            markdown_list += scan_directory(full_path, prefix + '    ')
+            # Directories are added to a list and processed first
+            dir_list.append(item)
         else:
-            # Add the file name to the list, formatted as a Markdown list item
-            markdown_list.append(f"{prefix}- {item}")
+            file_dict.append(item)
+
+    # Add directories to markdown_list
+    for d in dir_list:
+        markdown_list.append(f"{prefix}- {d}/")
+        markdown_list += scan_directory(os.path.join(path, d), prefix + '    ')
+
+    # Sort and add files to markdown_list
+    for file in file_dict:
+        markdown_list.append(f"{prefix}- {file}")
 
     return markdown_list
 
